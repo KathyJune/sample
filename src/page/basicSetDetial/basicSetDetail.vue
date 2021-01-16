@@ -158,7 +158,6 @@ export default {
       let map = this.map
 
       function addLayer () {
-        debugger
         if (basicSet.bounds) {
           let bounds = JSON.parse(basicSet.bounds)
           map.fitBounds(bounds)

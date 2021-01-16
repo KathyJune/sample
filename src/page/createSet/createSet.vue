@@ -70,6 +70,7 @@
                 <el-table
                   :data="classList"
                   border
+                  highlight-current-row
                   style="width: 100%">
                   <el-table-column
                     fixed="right"
@@ -283,7 +284,7 @@ export default {
       formLabelWidth: '120px',
       categoryForm: {
         name: '',
-        fillColor: 0,
+        fillColor: '',
         storkColor: '',
         icon: '',
         code: null,
