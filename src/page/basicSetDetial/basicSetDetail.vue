@@ -15,6 +15,7 @@
             <div class="retract-text large-text regular-vertical-padding bright-blue-text">{{ setInfo.time }}</div>
             <div class="title-2">分类体系统计</div>
             <div class="chart" id="chart"></div>
+            <el-button type="primary" @click="back">返回</el-button>
           </VuePerfectScrollbar>
         </nav>
       </AppSidebar>
@@ -31,6 +32,7 @@ import 'leaflet.pm'
 import { sampleDistributionOption } from '../sampleData'
 import echarts from 'echarts'
 import 'leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.js'
+import { beautySub } from 'src/utils/factory'
 //
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -66,10 +68,10 @@ export default {
           let rawData = response.data.data
           if (rawData) {
             this.setInfo.name = rawData.name
-            this.setInfo.desc = rawData.desc
+            // this.setInfo.desc = rawData.desc
             this.setInfo.vectorTile = rawData.vectorTile
             if (rawData.classTypeGroupSum) {
-              this.setInfo.classDis.yAxis.data = rawData.classTypeGroupSum.map((o) => o.type)
+              this.setInfo.classDis.yAxis.data = rawData.classTypeGroupSum.map((o) => beautySub(o.type, 6))
               this.setInfo.classDis.series.data = rawData.classTypeGroupSum.map((o) => o.count)
             }
             // this.setInfo.time =
@@ -215,13 +217,16 @@ export default {
       } catch (e) {
         console.log(e)
       }
+    },
+    back () {
+      this.$router.push({ name: 'basicSet' })
     }
   },
   data () {
     return {
       setId: false,
       setInfo: {
-        name: '谷歌美国加州数据集',
+        name: '',
         desc: '本样本集创建于2021-01-03，包含美国加州所有地物的信息，地物信息采集于2018年',
         time: '2018/01/03 -- 2019/01/01',
         classDis: false

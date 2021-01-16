@@ -430,3 +430,11 @@ export const generateTree = function (data, param) {
 export const formatPoint = function (json) {
   return json.replace('(', '').replace(')', '').split(',')
 }
+
+export const beautySub = function (str, len) {
+  let reg = /[\u4e00-\u9fa5]/g // 专业匹配中文
+  let slice = str.substring(0, len)
+  let chineseCharNum = (~~(slice.match(reg) && slice.match(reg).length))
+  let realen = slice.length * 2 - chineseCharNum
+  return str.substr(0, realen) + (realen < str.length ? '...' : '')
+}

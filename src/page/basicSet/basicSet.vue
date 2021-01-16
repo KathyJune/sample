@@ -44,9 +44,7 @@
           <img src="/img/project.png" draggable="false" class="box-card-image">
           <div style="padding: 10px;">
             <p v-html="item.name" class="box-card-title"></p>
-            <div class="box-card-bottom clearfix">
-              <el-button type="primary" size="mini" class="button" @click="inspectSet(item)">查看</el-button>
-            </div>
+            <el-button type="primary" size="mini" class="button" @click="inspectSet(item)" >查看</el-button>
           </div>
         </el-card>
       </el-card>
@@ -60,6 +58,7 @@ import { sampleStatus, setList } from '../sampleData'
 import { getBasicList, getBasicDetail } from 'src/api/sample'
 import echarts from 'echarts'
 import MapSelector from 'src/components/mapSelector/index'
+import { beautySub } from 'src/utils/factory'
 
 export default {
   name: 'basicSet',
@@ -95,9 +94,9 @@ export default {
   },
   methods: {
     init () {
-      this.setList = setList
+      // this.setList = setList
       this.sampleStatus = sampleStatus
-      this.renderChart()
+      // this.renderChart()
       this.getSetList()
     },
     // 选中行政级别（国家/省）
@@ -130,7 +129,7 @@ export default {
       this.$router.push({ name: 'basicSetDetail', params: { id: item.id } })
     },
     renderChart () {
-      this.sampleStatus.yAxis.data = this.setList.map((o) => o.name)
+      this.sampleStatus.yAxis.data = this.setList.map((o) => beautySub(o.name, 6))
       this.sampleStatus.series[0].data = this.setList.map((o) => o.count)
       console.log(this.sampleStatus)
       let myChart = echarts.init(document.getElementById('chart'))

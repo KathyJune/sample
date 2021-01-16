@@ -10,8 +10,11 @@
     </div>
     <div class="steps" :class="containerClass">
       <div v-if="currentStep === 1" class="type step">
-        <div class="step-title">
-          设置样本集名称和描述
+        <div class="title flex-row">
+          <span class="step-title">
+            设置样本集名称和描述
+          </span>
+          <el-button size="mini" type="primary" class="title-btn" @click="exit">退出</el-button>
         </div>
         <!--确定训练类别-->
         <div class="cards-container">
@@ -42,8 +45,13 @@
       </div>
       <div v-if="currentStep === 2" class="step">
         <div v-if="!showDetail">
-          <div class="step-title">
-            选择分类体系
+          <div class="title flex-row">
+            <span class="step-title">
+              选择分类体系
+            </span>
+            <el-button size="mini" type="primary" class="title-btn" @click="back(1)">返回</el-button>
+            <el-button size="mini" type="primary" class="title-btn" @click="exit">退出</el-button>
+            <el-button size="mini" type="primary" class="title-btn">下一步</el-button>
           </div>
           <div class="">
             <div class="page page-classification main-content">
@@ -125,9 +133,12 @@
         </div>
         <!--设置明细-->
         <div v-if="showDetail">
-          <div class="step-title">
-            创建分类体系
-            <el-button>进入下一步</el-button>
+          <div class="title flex-row">
+            <span class="step-title">
+              选择分类体系
+            </span>
+            <el-button size="mini" type="primary" class="title-btn" @click="back(2)">返回</el-button>
+            <el-button size="mini" type="primary" class="title-btn" @click="exit">退出</el-button>
           </div>
           <div class="content">
             <div class="main-content category">
@@ -325,6 +336,13 @@ export default {
     }
   },
   methods: {
+    exit () {
+      this.$router.push({ name: 'basicSet' })
+    },
+    back (code) {
+      if (code === 1) this.currentStep = 1
+      else if (code === 2) this.showDetail = false
+    },
     init () {
       this.queryFactor = this.$route.params.queryFactor
       console.log(this.queryFactor)
@@ -595,12 +613,12 @@ export default {
       }
       console.log(putData)
       putCategory({ data: putData }).then((response) => {
-        debugger
         if (response && response.data.code === _this.$config.statusCode) {
           _this.$notify.success({ title: '提示', message: '节点数保存成功！' })
         } else {
           _this.$notify.error({ title: '错误', message: response.message })
         }
+        _this.showDetail = false
       }).catch((response) => {
         // console.log(response)
       })
@@ -626,8 +644,7 @@ export default {
         this.$message.error('上传头像图片大小不能超过 50K!')
       }
       return isLt2M
-    },
-
+    }
   }
 }
 </script>
@@ -649,7 +666,7 @@ export default {
     height: 36px;
   }
   .category .table-panel {
-    height: calc(100vh - 175px);
+    /*height: calc(100vh - 175px);*/
     background-color: #ffffff;
     padding: 15px;
     display: flex;
@@ -665,7 +682,7 @@ export default {
     height: 100%;
   }
   .category .search-tree {
-    height: calc(100vh - 210px);
+    /*height: calc(100vh - 210px);*/
     overflow-y: auto;
   }
   .category .center-buttom {
