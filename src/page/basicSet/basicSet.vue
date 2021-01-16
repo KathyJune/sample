@@ -25,8 +25,8 @@
                 placeholder="截止时间">
             </el-date-picker>
             <div class="radios">
-              <el-radio v-model="queryFactor.type" label="0">地物提取</el-radio>
-              <el-radio v-model="queryFactor.type" label="1">变化监测</el-radio>
+              <el-radio v-model="queryFactor.type" label="1">地物提取</el-radio>
+              <el-radio v-model="queryFactor.type" label="2">变化监测</el-radio>
             </div>
             <div>
               <el-button @click="getSetList" size="mini" type="primary">检索</el-button>
