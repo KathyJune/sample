@@ -8,11 +8,11 @@
         <nav class="sidebar-nav">
           <VuePerfectScrollbar class="scroll-area" :settings="psSettings">
             <div class="title-2">数据集名称</div>
-            <div class="retract-text large-text regular-vertical-padding">{{setInfo.name}}</div>
+            <div class="retract-text large-text regular-vertical-padding">{{ setInfo.name }}</div>
             <div class="title-2">数据集描述</div>
-            <div class="retract-text large-text regular-vertical-padding">{{setInfo.desc}}</div>
+            <div class="retract-text large-text regular-vertical-padding">{{ setInfo.desc }}</div>
             <div class="title-2">数据采集时间</div>
-            <div class="retract-text large-text regular-vertical-padding bright-blue-text">{{setInfo.time}}</div>
+            <div class="retract-text large-text regular-vertical-padding bright-blue-text">{{ setInfo.time }}</div>
             <div class="title-2">分类体系统计</div>
             <div class="chart" id="chart"></div>
           </VuePerfectScrollbar>
@@ -31,7 +31,15 @@ import 'leaflet.pm'
 import { sampleDistributionOption } from '../sampleData'
 import echarts from 'echarts'
 import 'leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.js'
+//
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
+
+const mapboxToken = 'pk.eyJ1IjoidnY1NDU0NTQiLCJhIjoiY2o4NDZwcHY2MDV6MzMzczV5eTBtbnZybyJ9.LhlZtGKozugZK7_bWSKgOQ'
+// const mapboxgl = window.mapboxgl
+mapboxgl.accessToken = mapboxToken
 const L = window.L
+
 export default {
   name: 'basicSetDetail',
   components: {
@@ -44,9 +52,10 @@ export default {
   methods: {
     init () {
       this.setId = this.$route.params.id
-      console.log(this.setId)
-      this.getSetDetail()
-      // this.initMap()
+      this.$nextTick(() => {
+        this.initMapBoxMap()
+        this.getSetDetail()
+      })
     },
     // TODO: 获取基础样本集的信息包括：名称（name, desc, time, classDis(类别分布), tileUrl(矢量瓦片地址).
     getSetDetail () {
@@ -54,14 +63,20 @@ export default {
       let url = this.$api.sample + '/sp/basic/sampleset/' + this.setId
       this.$http.get(url).then((response) => {
         if (response && response.status === 200) {
-          this.setInfo.name = response.data.data.name
-          this.setInfo.desc = response.data.data.desc
-          this.setInfo.vectorTile = response.data.data.vectorTile
-          this.setInfo.classDis.yAxis.data = response.data.data.classTypeGroupSum.map((o) => o.type)
-          this.setInfo.classDis.series.data = response.data.data.classTypeGroupSum.map((o) => o.count)
-          // this.setInfo.time =
-          this.initChart()
-          this.initMap()
+          let rawData = response.data.data
+          if (rawData) {
+            this.setInfo.name = rawData.name
+            this.setInfo.desc = rawData.desc
+            this.setInfo.vectorTile = rawData.vectorTile
+            if (rawData.classTypeGroupSum) {
+              this.setInfo.classDis.yAxis.data = rawData.classTypeGroupSum.map((o) => o.type)
+              this.setInfo.classDis.series.data = rawData.classTypeGroupSum.map((o) => o.count)
+            }
+            // this.setInfo.time =
+            this.initChart()
+            this.renderVectorTile(rawData)
+            // this.initMap()
+          }
         } else {
           this.$notify.error({ title: '错误', message: response.message })
         }
@@ -75,6 +90,111 @@ export default {
     initChart () {
       let myChart = echarts.init(document.getElementById('chart'))
       myChart.setOption(this.setInfo.classDis)
+    },
+    initMapBoxMap () {
+      let container = 'map'
+      let map = new mapboxgl.Map({
+        container: container,
+        style: {
+          version: 8,
+          sources: {},
+          layers: []
+        },
+        center: [-86.21315, 32.392138],
+        zoom: 10
+      })
+      this.map = map
+      map.on('load', () => {
+        map.addSource('earth', {
+          type: 'raster',
+          tiles: [
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+          ],
+          'minzoom': 2,
+          'maxzoom': 18,
+          tileSize: 256
+        })
+
+        // map.addSource('street-vec', {
+        //   type: 'raster',
+        //   tiles: [
+        //     'http://t0.tianditu.com/vec_w/wmts?tk=ade4530538c006d4b4a3ac8b9138499f&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles'
+        //   ],
+        //   'minzoom': 0,
+        //   'maxzoom': 18,
+        //   tileSize: 256
+        // })
+        //
+        // map.addLayer({
+        //   id: 'street-vec',
+        //   type: 'raster',
+        //   source: 'street-vec'
+        // })
+        //
+        // map.addSource('street-cva', {
+        //   type: 'raster',
+        //   tiles: [
+        //     'http://t0.tianditu.com/cva_w/wmts?tk=ade4530538c006d4b4a3ac8b9138499f&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles'
+        //   ],
+        //   'minzoom': 0,
+        //   'maxzoom': 18,
+        //   tileSize: 256
+        // })
+        // map.addLayer({
+        //   id: 'street-cva',
+        //   type: 'raster',
+        //   source: 'street-cva'
+        // })
+        map.addLayer({
+          id: 'earth',
+          type: 'raster',
+          source: 'earth'
+        })
+      })
+    },
+    renderVectorTile (basicSet) {
+      let map = this.map
+
+      function addLayer () {
+        debugger
+        if (basicSet.bounds) {
+          let bounds = JSON.parse(basicSet.bounds)
+          map.fitBounds(bounds)
+        }
+        let source = 'source-' + basicSet.name
+        let layer = 'dataset-vector' + basicSet.name
+        map.addSource(source, {
+          'type': 'vector',
+          // url: 'mapbox://examples.8fgz4egr',
+          'tiles': [
+            basicSet.vectorTile
+          ],
+          'minzoom': 1,
+          'maxzoom': 18
+        })
+        // 添加主图层
+        map.addLayer(
+          {
+            'id': layer,
+            'type': 'fill',
+            'source': 'source-' + basicSet.name,
+            'source-layer': basicSet.layer,
+            'paint': {
+              'fill-color': '#b13939',
+              'fill-opacity': 1
+            }
+          }
+        )
+      }
+
+      addLayer()
+      // if (map.loaded()) {
+      //   addLayer()
+      // } else {
+      //   map.on('load', () => {
+      //     addLayer()
+      //   })
+      // }
     },
     initMap () {
       const _this = this
@@ -118,11 +238,11 @@ export default {
 }
 </script>
 <style>
-  @import "../../../node_modules/leaflet.pm/dist/leaflet.pm.css";
+@import "../../../node_modules/leaflet.pm/dist/leaflet.pm.css";
 </style>
 <style lang="scss">
-  @import "../sampleManager";
-  @import "../sampleSetManager/sampleSetManager";
-  @import "basicSetDetail";
-  @import "../layout";
+@import "../sampleManager";
+@import "../sampleSetManager/sampleSetManager";
+@import "basicSetDetail";
+@import "../layout";
 </style>
