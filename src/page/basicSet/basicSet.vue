@@ -42,7 +42,7 @@
       <el-card class="set-card">
         <el-card class="set-item" v-for="item in setList" :key="item.id">
           <img src="/img/project.png" draggable="false" class="box-card-image">
-          <div style="padding: 10px;">
+          <div style="padding: 5px 0 0 0; display: flex; flex-direction: column; align-items: center">
             <p v-html="item.name" class="box-card-title"></p>
             <el-button type="primary" size="mini" class="button" @click="inspectSet(item)" >查看</el-button>
           </div>
