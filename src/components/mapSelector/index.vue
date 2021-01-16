@@ -133,6 +133,7 @@ export default {
     returnBack () {
       //
       this.loadGeoJson()
+      this.$emit('selectArea', '')
     }
   },
   data () {

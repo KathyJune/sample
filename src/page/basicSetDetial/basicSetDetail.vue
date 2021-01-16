@@ -20,9 +20,13 @@
         </nav>
       </AppSidebar>
     </div>
-    <b-row>
+    <b-row class="map-area">
       <div class="map" id='map' style="height: calc(100vh - 101px);"></div>
     </b-row>
+    <div style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; align-items: center" @click="switchBase">
+      <img style="width: 80px; height: 80px;" src="../../assets/img/satellite.jpg" >
+      <el-checkbox v-model="showSatellite">显示遥感影像</el-checkbox>
+    </div>
   </div>
 </template>
 <script>
@@ -55,7 +59,6 @@ export default {
     init () {
       this.setId = this.$route.params.id
       this.$nextTick(() => {
-        this.initMapBoxMap()
         this.getSetDetail()
       })
     },
@@ -77,7 +80,7 @@ export default {
             // this.setInfo.time =
             this.initChart()
             this.renderVectorTile(rawData)
-            // this.initMap()
+            this.initMapBoxMap(this.rawData.baseurl1, this.rawData.baseurl2)
           }
         } else {
           this.$notify.error({ title: '错误', message: response.message })
@@ -93,7 +96,7 @@ export default {
       let myChart = echarts.init(document.getElementById('chart'))
       myChart.setOption(this.setInfo.classDis)
     },
-    initMapBoxMap () {
+    initMapBoxMap (url1, url2) {
       let container = 'map'
       let map = new mapboxgl.Map({
         container: container,
@@ -110,13 +113,23 @@ export default {
         map.addSource('earth', {
           type: 'raster',
           tiles: [
+            // this.url1
             'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
           ],
           'minzoom': 2,
           'maxzoom': 18,
           tileSize: 256
         })
-
+        map.addSource('black', {
+          type: 'raster',
+          tiles: [
+            // this.url2
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+          ],
+          'minzoom': 2,
+          'maxzoom': 18,
+          tileSize: 256
+        })
         // map.addSource('street-vec', {
         //   type: 'raster',
         //   tiles: [
@@ -152,11 +165,18 @@ export default {
           type: 'raster',
           source: 'earth'
         })
+        map.addLayer({
+          id: 'black',
+          type: 'raster',
+          source: 'black'
+        })
+        // TODO: 添加一个黑色的底图，设为可见
+        this.map.setLayoutProperty('earth', 'visibility', 'none')
+        this.map.setLayoutProperty('black', 'visibility', 'visible')
       })
     },
     renderVectorTile (basicSet) {
       let map = this.map
-
       function addLayer () {
         if (basicSet.bounds) {
           let bounds = JSON.parse(basicSet.bounds)
@@ -187,7 +207,6 @@ export default {
           }
         )
       }
-
       addLayer()
       // if (map.loaded()) {
       //   addLayer()
@@ -197,26 +216,38 @@ export default {
       //   })
       // }
     },
-    initMap () {
-      const _this = this
-      try {
-        _this.map = L.map('map', {
-          // -86.21315,32.392138
-          center: [32.392138, -86.21315],
-          zoom: 15,
-          zoomControl: false
-        })
-        let osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-        let osm = new L.TileLayer(osmUrl, { minZoom: 5, maxZoom: 18 })
-        _this.map.addLayer(osm)
-        let url = this.setInfo.vectorTile
-        console.log(url)
-        // L.esri.basemapLayer('Imagery').addTo(this.map) // 定义basemapLayer并将其加载到地图容器中
-        L.vectorGrid.protobuf(url).addTo(_this.map)
-      } catch (e) {
-        console.log(e)
+    switchBase () {
+      this.showSatellite = !this.showSatellite
+      if (this.showSatellite) {
+        // 用户选择看地图的时候，显示地图，隐藏黑图
+        this.map.setLayoutProperty('earth', 'visibility', 'visible')
+        this.map.setLayoutProperty('black', 'visibility', 'none')
+      } else {
+        // 用户选择看地图的时候，显示黑图，隐藏底图
+        this.map.setLayoutProperty('black', 'visibility', 'visible')
+        this.map.setLayoutProperty('earth', 'visibility', 'none')
       }
     },
+    // initMap () {
+    //   const _this = this
+    //   try {
+    //     _this.map = L.map('map', {
+    //       // -86.21315,32.392138
+    //       center: [32.392138, -86.21315],
+    //       zoom: 15,
+    //       zoomControl: false
+    //     })
+    //     let osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    //     let osm = new L.TileLayer(osmUrl, { minZoom: 5, maxZoom: 18 })
+    //     _this.map.addLayer(osm)
+    //     let url = this.setInfo.vectorTile
+    //     console.log(url)
+    //     // L.esri.basemapLayer('Imagery').addTo(this.map) // 定义basemapLayer并将其加载到地图容器中
+    //     L.vectorGrid.protobuf(url).addTo(_this.map)
+    //   } catch (e) {
+    //     console.log(e)
+    //   }
+    // },
     back () {
       this.$router.push({ name: 'basicSet' })
     }
@@ -230,6 +261,7 @@ export default {
         time: '2018/01/03 -- 2019/01/01',
         classDis: false
       },
+      showSatellite: false,
       psSettings: {
         maxScrollbarLength: 200,
         minScrollbarLength: 40,

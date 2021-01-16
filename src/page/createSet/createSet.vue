@@ -378,7 +378,7 @@ export default {
       this.classDialogFormVisible = true
     },
     handleEditClass (row) {
-      this.form = row
+      this.classForm = row
       this.formTitle = '修改分类'
       this.opt = 'edit'
       this.classDialogFormVisible = true
@@ -390,7 +390,7 @@ export default {
         if (valid) {
           let promise
           // 分类体系类别为自定义分类体系
-          _this.form.customType = 2
+          _this.classForm.customType = 2
           if (_this.opt === 'add') {
             promise = addClassify(_this.classForm)
           } else {
@@ -399,6 +399,7 @@ export default {
           promise.then((response) => {
             const { data } = response
             if (data && data.code === _this.$config.statusCode) {
+              console.log('in here')
               _this.getClassList()
             } else {
               _this.$notify.error({ title: '错误', message: data.message })
@@ -424,10 +425,10 @@ export default {
         const { data } = response
         // debugger
         if (data && data.code === 200) {
-          _this.classList = []
-          console.log(_this.classList)
+          // console.log(_this.classList)
           _this.classList = data.data.list
-          console.log(_this.classList)
+          this.$forceUpdate()
+          // console.log(_this.classList)
         } else {
           _this.$notify.error({ title: '错误', message: data.message })
         }
@@ -469,7 +470,7 @@ export default {
     handleEditCategory (row) {
       let id = row.id
       const _form = this.record.find((o) => o.id === id)
-      this.form = _form
+      this.classForm = _form
       this.formTitle = '修改分类'
       this.opt = 'edit'
       this.categoryDialogFormVisible = true
@@ -537,8 +538,8 @@ export default {
     // 删除分类类别
     handleDeleteCategory (row) {
       const _this = this
-      this.delCategory(row.id).then((response) => {
-        if (response && response.code === _this.$config.statusCode) {
+      delCategory(row.id).then((response) => {
+        if (response && response.data.code === _this.$config.statusCode) {
           _this.getCategoryList()
         } else {
           _this.$notify.error({ title: '错误', message: response.message })
@@ -630,8 +631,8 @@ export default {
       let reader = new FileReader()
       reader.readAsDataURL(file.raw)
       reader.onload = function (e) {
-        _this.form.icon = e.target.result
-        _this.$set(_this.form, e.target.result, 'icon')
+        _this.classForm.icon = e.target.result
+        _this.$set(_this.classForm, e.target.result, 'icon')
       }
     },
     beforeAvatarUpload (file) {

@@ -46,7 +46,7 @@ export const putCategory = (params) => {
 
 export const delCategory = (id) => {
   return axios.request({
-    url: config.baseUrl + 'category/delete/' + id,
+    url: config.baseUrl1 + 'category/delete/' + id,
     method: 'delete'
   })
 }

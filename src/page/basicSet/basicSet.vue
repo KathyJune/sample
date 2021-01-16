@@ -3,12 +3,11 @@
     <div class="flex-row">
       <div class="geo-picker">
         <el-card>
-          <map-selector @selectArea="selectArea"></map-selector>
+          <map-selector @selectArea="selectArea" :zoneCodeList="zoneCodeList"></map-selector>
         </el-card>
       </div>
       <div class="top-right-group">
-        <el-card id="chart" class="card-2">
-        </el-card>
+        <el-card id="chart" class="card-2"></el-card>
         <el-card class="card-3">
           <div class="title-1">条件过滤</div>
           <div>
@@ -68,6 +67,7 @@ export default {
   },
   data () {
     return {
+      zoneCodeList: false,
       queryFactor: {
         startTime: '2020/1/10',
         endTime: '2021/01/11',
@@ -113,6 +113,8 @@ export default {
       this.$http.post(url, this.queryFactor).then((response) => {
         if (response && response.status === 200) {
           this.setList = response.data.data.list
+          // 如果是第一次请求就给地图上色
+          if (!this.zoneCodeList) this.colorMap()
           this.renderChart()
           this.queryFactor.type = this.queryFactor.type.toString()
         } else {
@@ -121,6 +123,9 @@ export default {
       }).catch((response) => {
         console.log(response)
       })
+    },
+    colorMap () {
+      this.zoneCodeList = this.setList.map((o) => o.zoneId)
     },
     createSet () {
       this.$router.push({ name: 'SetCreator', params: { queryFactor: this.queryFactor } })
