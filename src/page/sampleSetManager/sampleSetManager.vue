@@ -94,7 +94,7 @@ export default {
       })
     },
     deleteSet (item) {
-      let url = this.$api.sampleSets + '/sp/sampleset/' + item.id
+      let url = this.$api.sample + '/sp/sampleset/' + item.id
       this.$http.delete(url).then((response) => {
         if (response && response.status === 200) {
           this.slices = response.data.data
@@ -104,7 +104,7 @@ export default {
       this.getSets()
     },
     getGrids (page) {
-      let url2 = this.$api.sampleSets + '/sp/sampleset/grids'
+      let url2 = this.$api.sample + '/sp/sampleset/grids'
       let option2 = {
         page: page,
         setId: this.selectedSetId,
@@ -168,7 +168,7 @@ export default {
        ***/
     startQuery () {
       // this.showTable = true
-      let url00 = this.$api.samplePreview + '/samples/query?size=' + this.perPage + '&page=' + this.currentPage
+      let url00 = this.$api.sample + '/samples/query?size=' + this.perPage + '&page=' + this.currentPage
       // let option00 = {
       //   'classType': [1],
       //   'source': ['DistrictofColumbia'],
@@ -250,7 +250,7 @@ export default {
       this.getSets()
     },
     getSets () {
-      let url = this.$api.sampleSets + '/sp/sampleset/list?size=' + this.page.perPage + '&page=' + this.page.currentPage
+      let url = this.$api.sample + '/sp/sampleset/list?size=' + this.page.perPage + '&page=' + this.page.currentPage
       this.$http.post(url, {}).then((response) => {
         if (response && response.status === 200) {
           this.sampleSets = response.data.data.list

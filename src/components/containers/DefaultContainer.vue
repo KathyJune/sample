@@ -10,7 +10,7 @@
       <!--<SidebarToggler class="d-md-down-none" display="lg" />-->
       <b-navbar-nav class="d-md-down-none">
         <b-nav-item class="px-3" to="/home/basicSet">基础样本集</b-nav-item>
-        <b-nav-item class="px-3" to="/home/sampleManager" exact>样本管理</b-nav-item>
+        <!--<b-nav-item class="px-3" to="/home/sampleManager" exact>样本管理</b-nav-item>-->
         <b-nav-item class="px-3" to="/home/sampleSetManager">训练样本集</b-nav-item>
         <!--<b-nav-item class="px-3" to="/sys/queryManage" >系统管理</b-nav-item>-->
         <!--<b-nav-item-dropdown id="nav_ddown" text="系统管理" extra-toggle-classes="nav-link-custom" class="px-3" right>-->

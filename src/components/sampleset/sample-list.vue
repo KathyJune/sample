@@ -38,6 +38,7 @@ export default {
   methods: {
     handleSampleChange (item) {
       this.selectedSlice = item
+      debugger
       this.$emit('handleSampleChange', item)
     },
     init () {

@@ -4,8 +4,8 @@
       <el-steps :active="currentStep" simple>
         <el-step title="创建样本集" icon="el-icon-picture"></el-step>
         <el-step title="选择样本" icon="el-icon-edit"></el-step>
-        <el-step title="选择算法" icon="el-icon-upload"></el-step>
-        <el-step title="模型训练" icon="el-icon-picture"></el-step>
+        <el-step title="分类映射" icon="el-icon-upload"></el-step>
+        <!--<el-step title="模型训练" icon="el-icon-picture"></el-step>-->
       </el-steps>
     </div>
     <div class="steps" :class="containerClass">

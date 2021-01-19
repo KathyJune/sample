@@ -42,7 +42,7 @@ module.exports = {
     port: 9620,
     proxy: {
       '/samplePreview': {
-        target: 'http://192.168.1.119:10087',
+        target: 'http://192.168.1.108:10087',
         ws: true,
         changeOrigin: true,
         proxyTimeout: 10000,
@@ -60,7 +60,7 @@ module.exports = {
         }
       },
       '/sample': {
-        target: 'http://192.168.1.119:10088',
+        target: 'http://192.168.1.108:10088',
         ws: true,
         changeOrigin: true,
         proxyTimeout: 10000,
