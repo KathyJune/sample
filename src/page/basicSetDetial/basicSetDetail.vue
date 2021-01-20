@@ -63,19 +63,21 @@ export default {
     getSetDetail () {
       this.setInfo.classDis = sampleDistributionOption
       let url = this.$api.sample + '/sp/basic/sampleset/' + this.setId
+      let _this = this
       this.$http.get(url).then((response) => {
         if (response && response.status === 200) {
           let rawData = response.data.data
           if (rawData) {
-            this.setInfo.name = rawData.name
+            _this.setInfo.name = rawData.name
             // this.setInfo.desc = rawData.desc
-            this.setInfo.vectorTile = rawData.vectorTile
+            _this.setInfo.vectorTile = rawData.vectorTile
             if (rawData.classTypeGroupSum) {
-              this.setInfo.classDis.yAxis.data = rawData.classTypeGroupSum.map((o) => beautySub(o.type, 6))
-              this.setInfo.classDis.series.data = rawData.classTypeGroupSum.map((o) => o.count)
+              _this.setInfo.classDis.yAxis.data = rawData.classTypeGroupSum.map((o) => beautySub(o.type, 6))
+              _this.setInfo.classDis.series[0].data = rawData.classTypeGroupSum.map((o) => o.count)
+              debugger
+              _this.initChart()
             }
             // this.setInfo.time =
-            this.initChart()
             this.renderVectorTile(rawData)
             // this.initMap()
           }

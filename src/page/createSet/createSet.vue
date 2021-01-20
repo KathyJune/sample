@@ -10,7 +10,7 @@
     </div>
     <div class="steps" :class="containerClass">
       <div v-if="currentStep === 1" class="type step">
-        <div class="title flex-row">
+        <div class="title flex-c-row">
           <span class="step-title">
             设置样本集名称和描述
           </span>
@@ -45,7 +45,7 @@
       </div>
       <div v-if="currentStep === 2" class="step">
         <div v-if="!showDetail">
-          <div class="title flex-row">
+          <div class="title flex-c-row">
             <span class="step-title">
               选择分类体系
             </span>
@@ -134,7 +134,7 @@
         </div>
         <!--设置明细-->
         <div v-if="showDetail">
-          <div class="title flex-row">
+          <div class="title flex-c-row">
             <span class="step-title">
               选择分类体系
             </span>

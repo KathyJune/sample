@@ -1,6 +1,6 @@
 <template>
   <div class="basic-set">
-    <div class="flex-row">
+    <div class="top-part flex-c-row">
       <div class="geo-picker">
         <el-card>
           <map-selector @selectArea="selectArea" :zoneCodeList="zoneCodeList"></map-selector>
@@ -37,7 +37,7 @@
         </el-card>
       </div>
     </div>
-    <div class="flex-row">
+    <div class="flex-c-row">
       <el-card class="set-card">
         <el-card class="set-item" v-for="item in setList" :key="item.id">
           <img src="/img/project.png" draggable="false" class="box-card-image">
