@@ -4,7 +4,10 @@
  * @description 通用api 接口
  */
 import axios from '@/libs/api.request'
-import { Pagination, baseUrl, imageUrl } from './config'
+import config from './config'
+const Pagination = config.Pagination
+const baseUrl = config.baseUrl
+const imageUrl = config.imageUrl
 /**
  * 获取列表数据 -- get
 * */
