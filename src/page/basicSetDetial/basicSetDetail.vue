@@ -23,6 +23,10 @@
     <b-row>
       <div class="map" id='map' style="height: calc(100vh - 101px);"></div>
     </b-row>
+    <div style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; align-items: center">
+      <img @click="switchBase(0)" style="width: 80px; height: 80px;" src="../../assets/img/satellite.jpg" >
+      <el-checkbox v-model="showSatellite" @change="switchBase(1)">显示遥感影像</el-checkbox>
+    </div>
   </div>
 </template>
 <script>
@@ -56,7 +60,6 @@ export default {
       this.setId = this.$route.params.id
       this.$nextTick(() => {
         this.initMapBoxMap()
-        this.getSetDetail()
       })
     },
     // TODO: 获取基础样本集的信息包括：名称（name, desc, time, classDis(类别分布), tileUrl(矢量瓦片地址).
@@ -74,18 +77,15 @@ export default {
             if (rawData.classTypeGroupSum) {
               _this.setInfo.classDis.yAxis.data = rawData.classTypeGroupSum.map((o) => beautySub(o.type, 6))
               _this.setInfo.classDis.series[0].data = rawData.classTypeGroupSum.map((o) => o.count)
-              debugger
               _this.initChart()
             }
-            // this.setInfo.time =
-            this.renderVectorTile(rawData)
-            // this.initMap()
+            _this.renderVectorTile(rawData)
           }
         } else {
           this.$notify.error({ title: '错误', message: response.message })
         }
       }).catch((response) => {
-        console.log(response)
+        // console.log(response)
       })
     },
     // TODO: 加载后台返回的矢量瓦片地址
@@ -97,13 +97,10 @@ export default {
     },
     initMapBoxMap () {
       let container = 'map'
+      mapboxgl.accessToken = 'pk.eyJ1Ijoibmlld3poIiwiYSI6ImNqbjRvM2F4ODA5ZDEzd2xkd2oxZnB4Y2UifQ.phMvmLw9t9lDxobKyYVbPw'
       let map = new mapboxgl.Map({
         container: container,
-        style: {
-          version: 8,
-          sources: {},
-          layers: []
-        },
+        style: 'mapbox://styles/mapbox/dark-v10',
         center: [-86.21315, 32.392138],
         zoom: 10
       })
@@ -118,105 +115,68 @@ export default {
           'maxzoom': 18,
           tileSize: 256
         })
-
-        // map.addSource('street-vec', {
-        //   type: 'raster',
-        //   tiles: [
-        //     'http://t0.tianditu.com/vec_w/wmts?tk=ade4530538c006d4b4a3ac8b9138499f&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles'
-        //   ],
-        //   'minzoom': 0,
-        //   'maxzoom': 18,
-        //   tileSize: 256
-        // })
-        //
-        // map.addLayer({
-        //   id: 'street-vec',
-        //   type: 'raster',
-        //   source: 'street-vec'
-        // })
-        //
-        // map.addSource('street-cva', {
-        //   type: 'raster',
-        //   tiles: [
-        //     'http://t0.tianditu.com/cva_w/wmts?tk=ade4530538c006d4b4a3ac8b9138499f&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles'
-        //   ],
-        //   'minzoom': 0,
-        //   'maxzoom': 18,
-        //   tileSize: 256
-        // })
-        // map.addLayer({
-        //   id: 'street-cva',
-        //   type: 'raster',
-        //   source: 'street-cva'
-        // })
         map.addLayer({
           id: 'earth',
           type: 'raster',
           source: 'earth'
         })
+        this.map.setLayoutProperty('earth', 'visibility', 'none')
+        this.getSetDetail()
       })
     },
     renderVectorTile (basicSet) {
       let map = this.map
-
-      function addLayer () {
-        if (basicSet.bounds) {
-          let bounds = JSON.parse(basicSet.bounds)
-          map.fitBounds(bounds)
-        }
-        let source = 'source-' + basicSet.name
-        let layer = 'dataset-vector' + basicSet.name
-        map.addSource(source, {
-          'type': 'vector',
-          // url: 'mapbox://examples.8fgz4egr',
-          'tiles': [
-            basicSet.vectorTile
-          ],
-          'minzoom': 1,
-          'maxzoom': 18
-        })
-        // 添加主图层
-        map.addLayer(
-          {
-            'id': layer,
-            'type': 'fill',
-            'source': 'source-' + basicSet.name,
-            'source-layer': basicSet.layer,
-            'paint': {
-              'fill-color': '#b13939',
-              'fill-opacity': 1
-            }
-          }
-        )
+      if (basicSet.bounds) {
+        let bounds = JSON.parse(basicSet.bounds)
+        map.fitBounds(bounds)
       }
-
-      addLayer()
-      // if (map.loaded()) {
-      //   addLayer()
-      // } else {
-      //   map.on('load', () => {
-      //     addLayer()
-      //   })
-      // }
+      let source = 'source-' + basicSet.name
+      let layer = 'dataset-vector' + basicSet.name
+      this.vectorLayerId = layer
+      map.addSource(source, {
+        'type': 'vector',
+        // url: 'mapbox://examples.8fgz4egr',
+        'tiles': [
+          basicSet.vectorTile
+        ],
+        'minzoom': 1,
+        'maxzoom': 18
+      })
+      // 添加主图层
+      map.addLayer(
+        {
+          'id': layer,
+          'type': 'fill',
+          'source': 'source-' + basicSet.name,
+          'source-layer': basicSet.layer,
+          'paint': {
+            'fill-color': '#b13939',
+            'fill-opacity': 1
+          }
+        }
+      )
+      // console.log('aaa')
     },
-    initMap () {
-      const _this = this
-      try {
-        _this.map = L.map('map', {
-          // -86.21315,32.392138
-          center: [32.392138, -86.21315],
-          zoom: 15,
-          zoomControl: false
-        })
-        let osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-        let osm = new L.TileLayer(osmUrl, { minZoom: 5, maxZoom: 18 })
-        _this.map.addLayer(osm)
-        let url = this.setInfo.vectorTile
-        console.log(url)
-        // L.esri.basemapLayer('Imagery').addTo(this.map) // 定义basemapLayer并将其加载到地图容器中
-        L.vectorGrid.protobuf(url).addTo(_this.map)
-      } catch (e) {
-        console.log(e)
+    switchBase (flag) {
+      if (!flag) {
+        this.showSatellite = !this.showSatellite
+      }
+      if (this.showSatellite) {
+        // 用户选择看地图的时候，显示地图，隐藏黑图
+        this.map.setLayoutProperty('earth', 'visibility', 'visible')
+        // this.map.setLayoutProperty('black', 'visibility', 'none')
+        this.map.setPaintProperty(this.vectorLayerId, 'fill-opacity', 0.4)
+        // this.map.setPaintProperty(this.vectorLayerId, 'line-color', '#b13939')
+        // 分层设色，看看行不行得通
+        // this.map.setPaintProperty(this.vectorLayerId, 'line-color', ["get", 'color'])
+      } else {
+        // 用户选择看地图的时候，显示黑图，隐藏底图
+        // this.map.setLayoutProperty('black', 'visibility', 'visible')
+        this.map.setLayoutProperty('earth', 'visibility', 'none')
+        this.map.setPaintProperty(this.vectorLayerId, 'fill-opacity', 1)
+        // this.map.setPaintProperty(this.vectorLayerId, 'fill-opacity', ['get', 'color'])
+        // 分层设色，看看行不行得通
+        // this.map.setPaintProperty(this.vectorLayerId, 'line-color', ['get', 'color'])
       }
     },
     back () {
@@ -225,6 +185,8 @@ export default {
   },
   data () {
     return {
+      // 用来修改矢量图层的样式
+      vectorLayerId: '',
       setId: false,
       setInfo: {
         name: '',
@@ -232,6 +194,7 @@ export default {
         time: '2018/01/03 -- 2019/01/01',
         classDis: false
       },
+      showSatellite: false,
       psSettings: {
         maxScrollbarLength: 200,
         minScrollbarLength: 40,

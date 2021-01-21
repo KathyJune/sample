@@ -15,7 +15,7 @@ const router = new Router({
     },
     {
       path: '/home',
-      redirect: '/home/sampleManager',
+      redirect: '/home/basicSet',
       name: 'Home',
       meta: {
         access: ['admin'],
