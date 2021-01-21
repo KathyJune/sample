@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import { getToken, canTurnTo } from '@/libs/util'
+import { canTurnTo } from '@/libs/util'
+// import { getToken, canTurnTo } from '@/libs/util'
 import config from '@/config'
 Vue.use(Router)
 const { homeName } = config
@@ -74,8 +75,7 @@ const router = new Router({
             this.refreshTimer = undefined
             next()
           }
-        }
-        ,
+        },
         {
           path: 'SetCreator',
           name: 'SetCreator',

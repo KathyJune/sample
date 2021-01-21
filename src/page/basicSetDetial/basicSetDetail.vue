@@ -44,7 +44,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 const mapboxToken = 'pk.eyJ1IjoidnY1NDU0NTQiLCJhIjoiY2o4NDZwcHY2MDV6MzMzczV5eTBtbnZybyJ9.LhlZtGKozugZK7_bWSKgOQ'
 // const mapboxgl = window.mapboxgl
 mapboxgl.accessToken = mapboxToken
-const L = window.L
+// const L = window.L
 
 export default {
   name: 'basicSetDetail',
