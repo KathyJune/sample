@@ -1,5 +1,5 @@
 <template>
-  <div class="map-container">
+  <div class="index">
     <el-button class="map-back" size="small" @click.stop="returnBack" v-if="mapType==='country'">退回</el-button>
     <div class="map-selector" id="selector-map"></div>
     <div class="map-selector-tips">
@@ -150,12 +150,11 @@ export default {
 }
 </script>
 <style lang="scss">
-  .map-container {
+  .index {
     width: 100%;
     height: 100%;
     position: relative;
     overflow: hidden;
-
     .map-selector {
       width: 100%;
       height: 100%;

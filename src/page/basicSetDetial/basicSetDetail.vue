@@ -88,9 +88,6 @@ export default {
         // console.log(response)
       })
     },
-    // TODO: 加载后台返回的矢量瓦片地址
-    renderTileUrl () {
-    },
     initChart () {
       let myChart = echarts.init(document.getElementById('chart'))
       myChart.setOption(this.setInfo.classDis)
